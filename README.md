@@ -6,20 +6,18 @@
 このリポジトリには **Nix パッケージング（flake.nix / package.nix）だけ** が入っています。
 Audiveris 本体のソースはフォークせず、flake の `inputs` で本家リポジトリを直接取得します。
 
-> リポジトリを公開したら、以下の `<your-github-account>` を自分の GitHub アカウント名に置き換えてください。
-
 ## 使い方
 
 ```console
 # そのまま起動（GUI）
-$ nix run github:<your-github-account>/nix-audiveris
+$ nix run github:ekkekuru2/nix-audiveris
 
 # バッチ変換（GUI なし）: 画像/PDF から MusicXML (.mxl) を書き出す
-$ nix run github:<your-github-account>/nix-audiveris -- \
+$ nix run github:ekkekuru2/nix-audiveris -- \
     -batch -transcribe -export -output ./out ./score.pdf
 
 # ユーザープロファイルへ入れる
-$ nix profile install github:<your-github-account>/nix-audiveris
+$ nix profile install github:ekkekuru2/nix-audiveris
 ```
 
 `nix run` は 2 回目以降はビルド済みのものを使います。初回は Audiveris を
@@ -31,7 +29,7 @@ $ nix profile install github:<your-github-account>/nix-audiveris
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nix-audiveris.url = "github:<your-github-account>/nix-audiveris";
+    nix-audiveris.url = "github:ekkekuru2/nix-audiveris";
   };
 
   outputs = { nixpkgs, nix-audiveris, ... }: {
@@ -117,6 +115,9 @@ $ nix flake check                     # サンプル楽譜の変換テストま�
   git リポジトリではないため、flake input の revision を埋め込むよう置換します。
 - Tesseract / Leptonica のネイティブライブラリは JavaCPP の jar から実行時に
   展開されるため、ラッパで `LD_LIBRARY_PATH` に C++ ランタイムを足しています。
+- 同じく `LD_LIBRARY_PATH` に GTK 3 を足しています。Audiveris は起動時に JNA で
+  `libgtk-3.so` を読んで表示スケールを検出しますが、`UnsatisfiedLinkError` を
+  捕まえていないため、GTK が無い環境では起動できません。
 
 ## 制限
 
