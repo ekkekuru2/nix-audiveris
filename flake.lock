@@ -1,0 +1,44 @@
+{
+  "nodes": {
+    "audiveris": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1786629623,
+        "narHash": "sha256-j9HGdOO2gwyP9IzYhvSVu5KaHCza7tyH8MywNrVIiSw=",
+        "owner": "Audiveris",
+        "repo": "audiveris",
+        "rev": "7a36078e7ba0c006052c1f661b949cf9b729f505",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Audiveris",
+        "repo": "audiveris",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1791956154,
+        "narHash": "sha256-jBYGPi4udQ9uo4KQp9m2J0546nJVQitG15gvZSaVVAs=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "55bfb4d7437bd4e09ab7cba58a43bd68eb310044",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "audiveris": "audiveris",
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
