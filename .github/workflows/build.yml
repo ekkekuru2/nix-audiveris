@@ -10,12 +10,33 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: cachix/install-nix-action@v31
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      # Builds the package and runs the transcription smoke test.
-      - run: nix flake check --print-build-logs
+      - name: Environment
+        run: |
+          nix --version
+          nix config show | grep -E '^(sandbox|system|max-jobs|cores) '
+          nproc
+          free -h
+          df -h /
+
+      - name: Build audiveris
+        run: nix build .#audiveris --print-build-logs
+
+      - name: Run audiveris -version
+        run: nix run . -- -version
+
+      - name: Transcription smoke test
+        run: nix build .#checks.x86_64-linux.transcribe --print-build-logs
+
+      - name: Flake check
+        run: nix flake check --print-build-logs
+
+      - name: Disk usage
+        if: always()
+        run: df -h /
