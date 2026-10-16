@@ -17,17 +17,11 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      - name: Environment
-        run: |
-          nix --version
-          nix config show | grep -E '^(sandbox|system|max-jobs|cores) '
-          nproc
-          free -h
-          df -h /
-
       - name: Build audiveris
         run: nix build .#audiveris --print-build-logs
 
+      # Runs the launcher itself, which is what catches environment problems
+      # such as a JAVA_HOME preset by the host.
       - name: Run audiveris -version
         run: nix run . -- -version
 
@@ -36,7 +30,3 @@ jobs:
 
       - name: Flake check
         run: nix flake check --print-build-logs
-
-      - name: Disk usage
-        if: always()
-        run: df -h /

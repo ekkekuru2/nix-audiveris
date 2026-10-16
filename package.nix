@@ -103,21 +103,21 @@ stdenv.mkDerivation (finalAttrs: {
       --subst-var-by tessdata ${tessdata} \
       --subst-var-by coreutils ${coreutils}
 
-    # Two sets of libraries have to be findable by the dynamic loader:
-    #  - the C++ runtime, for the Tesseract/Leptonica libraries that the
-    #    JavaCPP jars unpack at run time;
-    #  - GTK 3, which Audiveris loads through JNA on startup to detect the
-    #    display scaling. It only catches Exception there, so the
-    #    UnsatisfiedLinkError of a missing libgtk-3.so is fatal.
+    # Audiveris loads GTK 3 through JNA on startup to detect the display
+    # scaling, and only catches Exception there, so a missing libgtk-3.so is
+    # fatal. Tell JNA where to find it rather than putting a GUI toolkit on
+    # LD_LIBRARY_PATH, which every child process would inherit.
+    substituteInPlace $out/share/audiveris/bin/Audiveris \
+      --replace-fail "DEFAULT_JVM_OPTS='" "DEFAULT_JVM_OPTS='\"-Djna.library.path=${gtk3}/lib\" "
+
+    # JAVA_HOME is --set, not --set-default: Audiveris needs Java 25, and
+    # environments such as CI runners often export a JAVA_HOME of their own.
+    # LD_LIBRARY_PATH carries the C++ runtime for the Tesseract/Leptonica
+    # libraries that the JavaCPP jars unpack at run time.
     makeWrapper $out/share/audiveris/bin/Audiveris $out/bin/audiveris \
-      --set-default JAVA_HOME ${jdk} \
+      --set JAVA_HOME ${jdk} \
       --set-default AUDIVERIS_OPTS "-Xms512m -Xmx8g -Dfile.encoding=UTF-8" \
-      --prefix LD_LIBRARY_PATH : ${
-        lib.makeLibraryPath [
-          stdenv.cc.cc.lib
-          gtk3
-        ]
-      } \
+      --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ stdenv.cc.cc.lib ]} \
       --run ". $out/share/audiveris/seed-tessdata.sh"
 
     runHook postInstall
